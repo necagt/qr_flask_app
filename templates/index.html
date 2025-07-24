@@ -6,10 +6,10 @@
     Raf Kodu: <input name="raf_kodu"><br><br>
     Emniyet Stoğu: <input name="emniyet_stogu"><br><br>
     Açıklama: <textarea name="aciklama"></textarea><br><br>
-    <button type="submit">Kaydet ve QR Oluştur</button>
+    <button type="submit">QR Oluştur</button>
 </form>
 
 {% if qr_filename %}
-    <h3>QR Kodu Oluşturuldu:</h3>
-    <img src="{{ url_for('static', filename='qrcodes/' + qr_filename) }}" width="200">
+    <h3>QR Kod:</h3>
+    <img src="{{ url_for('static', filename='qrcodes/' + qr_filename) }}" width="250">
 {% endif %}
