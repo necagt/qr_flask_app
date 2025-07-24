@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QR Kod Oluştur</title>
+</head>
+<body>
+    <h2>Veri Girişi</h2>
+    <form method="POST">
+        <label>Ad:</label><br>
+        <input type="text" name="name" required><br><br>
+        <label>Açıklama:</label><br>
+        <textarea name="description" required></textarea><br><br>
+        <button type="submit">QR Kod Oluştur</button>
+    </form>
+
+    {% if qr_image %}
+        <h3>QR Kodunuz:</h3>
+        <img src="{{ qr_image }}" alt="QR Kod">
+    {% endif %}
+</body>
+</html>
