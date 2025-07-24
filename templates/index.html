@@ -8,3 +8,8 @@
     Açıklama: <textarea name="aciklama"></textarea><br><br>
     <button type="submit">Kaydet ve QR Oluştur</button>
 </form>
+
+{% if qr_filename %}
+    <h3>QR Kodu Oluşturuldu:</h3>
+    <img src="{{ url_for('static', filename='qrcodes/' + qr_filename) }}" width="200">
+{% endif %}
