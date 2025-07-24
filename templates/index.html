@@ -1,15 +1,16 @@
-<h2>Cihaz Bilgisi Girişi</h2>
-<form method="POST">
-    Cihaz Adı: <input name="cihaz_adi"><br><br>
-    Cihaz Kodu: <input name="cihaz_kodu"><br><br>
-    Tarih: <input type="date" name="tarih"><br><br>
-    Raf Kodu: <input name="raf_kodu"><br><br>
-    Emniyet Stoğu: <input name="emniyet_stogu"><br><br>
-    Açıklama: <textarea name="aciklama"></textarea><br><br>
-    <button type="submit">QR Oluştur</button>
-</form>
-
-{% if qr_filename %}
-    <h3>QR Kod:</h3>
-    <img src="{{ url_for('static', filename='qrcodes/' + qr_filename) }}" width="250">
-{% endif %}
+<!DOCTYPE html>
+<html>
+<head><title>QR Oluştur</title></head>
+<body>
+    <h2>Cihaz Bilgileri</h2>
+    <form action="/generate_qr" method="post">
+        <input name="cihaz_adi" placeholder="Cihaz Adı"><br>
+        <input name="cihaz_kodu" placeholder="Cihaz Kodu"><br>
+        <input name="tarih" type="date"><br>
+        <input name="raf_kodu" placeholder="Raf Kodu"><br>
+        <input name="emniyet_stogu" type="number" placeholder="Emniyet Stoğu"><br>
+        <textarea name="aciklama" placeholder="Açıklama"></textarea><br>
+        <button type="submit">QR Kodu Oluştur</button>
+    </form>
+</body>
+</html>
