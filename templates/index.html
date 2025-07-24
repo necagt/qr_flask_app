@@ -1,16 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head><title>QR Oluştur</title></head>
+<head>
+    <title>Veri Görüntüleme</title>
+</head>
 <body>
-    <h2>Cihaz Bilgileri</h2>
-    <form action="/generate_qr" method="post">
-        <input name="cihaz_adi" placeholder="Cihaz Adı"><br>
-        <input name="cihaz_kodu" placeholder="Cihaz Kodu"><br>
-        <input name="tarih" type="date"><br>
-        <input name="raf_kodu" placeholder="Raf Kodu"><br>
-        <input name="emniyet_stogu" type="number" placeholder="Emniyet Stoğu"><br>
-        <textarea name="aciklama" placeholder="Açıklama"></textarea><br>
-        <button type="submit">QR Kodu Oluştur</button>
-    </form>
+    <h1>Ad: {{ name }}</h1>
+    <p>Açıklama: {{ description }}</p>
 </body>
 </html>
