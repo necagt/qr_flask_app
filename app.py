@@ -1,59 +1,65 @@
-from flask import Flask, request, render_template, redirect, url_for
-import qrcode
-import uuid
 import os
+import sqlite3
+import uuid
+from flask import Flask, request, redirect, url_for, render_template, send_file
+import qrcode
 
 app = Flask(__name__)
 
-# Verileri tutmak için geçici bellek (deploy kapanınca sıfırlanır)
-data_store = {}
+DB_PATH = "veritabani.db"
 
-@app.route('/')
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS entries (
+            id TEXT PRIMARY KEY,
+            name TEXT NOT NULL,
+            department TEXT NOT NULL
+        );
+    """)
+    conn.commit()
+    conn.close()
+
+@app.route("/", methods=["GET", "POST"])
 def index():
-    return render_template('index.html')
+    if request.method == "POST":
+        name = request.form["name"]
+        department = request.form["department"]
+        unique_id = str(uuid.uuid4())
 
-@app.route('/generate_qr', methods=['POST'])
-def generate_qr():
-    # Form verilerini al
-    cihaz_adi = request.form['cihaz_adi']
-    cihaz_kodu = request.form['cihaz_kodu']
-    tarih = request.form['tarih']
-    raf_kodu = request.form['raf_kodu']
-    emniyet_stogu = request.form['emniyet_stogu']
-    aciklama = request.form['aciklama']
+        # DB'ye ekle
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO entries (id, name, department) VALUES (?, ?, ?)", (unique_id, name, department))
+        conn.commit()
+        conn.close()
 
-    # Benzersiz kimlik (UUID)
-    cihaz_id = str(uuid.uuid4())
+        # QR kod oluştur
+        qr_url = request.url_root + "veri/" + unique_id
+        qr = qrcode.make(qr_url)
 
-    # Bellekte sakla
-    data_store[cihaz_id] = {
-        'cihaz_adi': cihaz_adi,
-        'cihaz_kodu': cihaz_kodu,
-        'tarih': tarih,
-        'raf_kodu': raf_kodu,
-        'emniyet_stogu': emniyet_stogu,
-        'aciklama': aciklama
-    }
+        qr_path = f"static/{unique_id}.png"
+        qr.save(qr_path)
 
-    # QR kod linki
-    link = url_for('cihaz_bilgileri', cihaz_id=cihaz_id, _external=True)
+        return render_template("qrcode.html", qr_image=qr_path, qr_url=qr_url)
 
-    # QR kodu oluştur
-    qr = qrcode.make(link)
-    qr_path = f'static/qr_{cihaz_id}.png'
-    os.makedirs('static', exist_ok=True)
-    qr.save(qr_path)
+    return render_template("form.html")
 
-    return render_template('show_qr.html', qr_image=qr_path)
+@app.route("/veri/<entry_id>")
+def veri(entry_id):
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT name, department FROM entries WHERE id = ?", (entry_id,))
+    row = cursor.fetchone()
+    conn.close()
 
-@app.route('/cihaz/<cihaz_id>')
-def cihaz_bilgileri(cihaz_id):
-    cihaz = data_store.get(cihaz_id)
-    if not cihaz:
-        return "Cihaz bulunamadı.", 404
-    return render_template('cihaz.html', cihaz=cihaz)
+    if row:
+        name, department = row
+        return render_template("index.html", name=name, department=department)
+    else:
+        return "Veri bulunamadı", 404
 
 if __name__ == "__main__":
     init_db()
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host="0.0.0.0", port=5000, debug=True)
